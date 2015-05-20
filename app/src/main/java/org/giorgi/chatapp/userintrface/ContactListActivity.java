@@ -1,7 +1,7 @@
 package org.giorgi.chatapp.userintrface;
 
-import com.example.freeunichat.model.Message;
-import com.example.freeunichat.transport.ChatEventListsner;
+import org.giorgi.chatapp.model.Message;
+import org.giorgi.chatapp.transport.ChatEventListsner;
 
 public class ContactListActivity extends CustomActivity implements ChatEventListsner {
 
