@@ -77,7 +77,7 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         // display. For example, if the user has set "Wi-Fi only" in prefs and the
         // device loses its Wi-Fi connection midway through the user using the app,
         // you don't want to refresh the display--this would force the display of
-        // an error page instead of stackoverflow.com content.
+        // an error page instead of content.
         if (refreshDisplay) {
             load();
         }
@@ -99,7 +99,7 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         }
     }
 
-    // Uses AsyncTask subclass to download the XML feed from stackoverflow.com.
+    // Uses AsyncTask subclass to download the JSON feed from cloud.
     // This avoids UI lock up. To prevent network operations from
     // causing a delay that results in a poor user experience, always perform
     // network operations on a separate thread from the UI.
