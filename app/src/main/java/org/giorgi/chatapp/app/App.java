@@ -132,24 +132,26 @@ public class App extends Application implements NetworkEventListener, ChatEventL
 
     @Override
     public void onStatusChanged(String contactId, boolean isOnline) {
-        // TODO Auto-generated method stub
+        // TODO: Auto-generated method stub
 
     }
 
-    @Override
-    public void onContactListDownloaded(List<Contact> contacts) {
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onContactListDownloaded(List<Contact> contacts) {
+        App.contacts = (ArrayList<Contact>) contacts;
     }
 
     @Override
     public void onAvatarDownloaded(byte[] imgData, String contactId) {
-        // TODO Auto-generated method stub
+        // TODO: Auto-generated method stub
 
     }
 
     @Override
     public void onError(int errorCode, String errorMsg) {
-        // TODO Auto-generated method stub
+        // TODO: Auto-generated method stub
 
     }
 
