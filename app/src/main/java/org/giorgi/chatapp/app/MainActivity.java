@@ -1,4 +1,4 @@
-package org.giorgi.chatapp;
+package org.giorgi.chatapp.app;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +13,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.giorgi.chatapp.R;
 
 import java.util.Locale;
 
@@ -173,11 +175,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
+                    return getString(R.string.title_recent).toUpperCase(l);
                 case 1:
-                    return getString(R.string.title_section2).toUpperCase(l);
+                    return getString(R.string.title_contacts).toUpperCase(l);
                 case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
+                    return getString(R.string.title_settings).toUpperCase(l);
             }
             return null;
         }
