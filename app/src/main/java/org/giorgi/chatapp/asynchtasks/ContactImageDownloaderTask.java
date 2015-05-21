@@ -1,22 +1,22 @@
 package org.giorgi.chatapp.asynchtasks;
 
-import java.util.List;
-
 import android.os.AsyncTask;
 
 import org.giorgi.chatapp.model.Contact;
 import org.giorgi.chatapp.transport.NetworkEventListener;
 
+import java.util.List;
+
 public class ContactImageDownloaderTask extends AsyncTask<List<Contact>, Object, Void> {
     private NetworkEventListener networkEventListener;
 
     public ContactImageDownloaderTask() {
-        // TODO Auto-generated constructor stub
+        // TODO: Auto-generated constructor stub
     }
 
     @Override
     protected Void doInBackground(List<Contact>... params) {
-        // TODO Auto-generated method stub
+        // TODO: Auto-generated method stub
         return null;
     }
 
