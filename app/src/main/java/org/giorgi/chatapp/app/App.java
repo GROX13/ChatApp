@@ -47,6 +47,8 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     }
 
     public static ArrayList<Contact> getContactList() {
+        if (contacts == null)
+            return new ArrayList<>();
         return contacts;
     }
 
