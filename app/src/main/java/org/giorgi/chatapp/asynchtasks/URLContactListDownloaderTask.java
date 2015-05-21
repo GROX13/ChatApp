@@ -42,7 +42,8 @@ public class URLContactListDownloaderTask extends ContactListDownloaderTask {
 
         try {
             stream = downloadUrl(url);
-            contacts = (ArrayList<Contact>) parser.parse(stream);
+            contacts = (ArrayList<Contact>)
+                    parser.parse(stream);
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
         } finally {
