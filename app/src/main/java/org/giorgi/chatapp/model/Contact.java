@@ -7,6 +7,7 @@ import org.giorgi.chatapp.R;
 import org.giorgi.chatapp.app.App;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Random;
 
 public class Contact {
 
@@ -68,5 +69,14 @@ public class Contact {
 
     public void setAvatarBitmap(byte[] avatarImage) {
         this.avatarImage = avatarImage;
+    }
+
+    public boolean getOnlineStatus() {
+        Random random = new Random();
+        return random.nextBoolean();
+    }
+
+    public void setOnlineStatus() {
+
     }
 }

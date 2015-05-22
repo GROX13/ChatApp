@@ -191,10 +191,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 TextView name = (TextView) row.findViewById(R.id.contact_name),
                         phone = (TextView) row.findViewById(R.id.phone_number);
                 ImageView image = (ImageView) row.findViewById(R.id.avatar_image);
+                ImageView imageStatus = (ImageView) row.findViewById(R.id.status_image);
 
                 name.setText(App.getContactList().get(position).getName());
                 phone.setText(App.getContactList().get(position).getPhone());
                 image.setImageBitmap(App.getContactList().get(position).getAvatarBitmap());
+
+                if (App.getContactList().get(position).getOnlineStatus())
+                    imageStatus.setImageResource(R.drawable.online);
+                else
+                    imageStatus.setImageResource(R.drawable.offline);
 
                 ((ListView) parent).setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override

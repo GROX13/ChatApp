@@ -12,6 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.Toast;
 
 import org.giorgi.chatapp.asynchtasks.ContactImageDownloaderTask;
+import org.giorgi.chatapp.asynchtasks.DBContactListDownloaderTask;
 import org.giorgi.chatapp.asynchtasks.URLContactListDownloaderTask;
 import org.giorgi.chatapp.database.MyDBHelper;
 import org.giorgi.chatapp.model.Contact;
@@ -45,8 +46,6 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     // For saving observers
     private static ArrayList<BaseAdapter> observers = new ArrayList<>();
     private static MyDBHelper dbHelper;
-    // The BroadcastReceiver that tracks network connectivity changes.
-    private NetworkReceiver receiver = new NetworkReceiver();
 
     public static void registerObserver(BaseAdapter observer) {
         App.observers.add(observer);
@@ -76,9 +75,11 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     private void initApp() {
         chatTransport = new TestChatTransport();
         chatTransport.addChatEventListsner(this);
+        dbHelper = new MyDBHelper(App.getContext(),
+                MyDBHelper.DATABASE_NAME, MyDBHelper.DATABASE_VERSION);
         // Set up contact list download for my application
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        receiver = new NetworkReceiver();
+        NetworkReceiver receiver = new NetworkReceiver();
         this.registerReceiver(receiver, filter);
 
         // Gets the user's network preference settings
@@ -96,8 +97,15 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         // you don't want to refresh the display--this would force the display of
         // an error page instead of content.
         if (refreshDisplay) {
-            load();
+            // TODO: Check if database exists
+            loadFromNet();
+        } else {
+            loadFromDataBase();
         }
+    }
+
+    private void loadFromDataBase() {
+        new DBContactListDownloaderTask(dbHelper, this).execute();
     }
 
     // Checks the network connection and sets the wifiConnected and mobileConnected
@@ -120,7 +128,7 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     // This avoids UI lock up. To prevent network operations from
     // causing a delay that results in a poor user experience, always perform
     // network operations on a separate thread from the UI.
-    private void load() {
+    private void loadFromNet() {
         if (((sPref.equals(ANY)) && (wifiConnected || mobileConnected))
                 || ((sPref.equals(WIFI)) && (wifiConnected))) {
             // AsyncTask subclass
@@ -163,8 +171,16 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     @SuppressWarnings("unchecked")
     public void onContactListDownloaded(List<Contact> contacts) {
         App.contacts = (ArrayList<Contact>) contacts;
+        if (!dbHelper.dataBaseExists())
+            notifyDataBaseSaver();
         notifyAvatarDownloader();
         notifyObservers();
+    }
+
+    private void notifyDataBaseSaver() {
+        for (int i = 0; i < App.contacts.size(); i++) {
+            dbHelper.addContact(App.contacts.get(i));
+        }
     }
 
     @SuppressWarnings("unchecked")

@@ -18,4 +18,7 @@
     <string name="json_error">Error parsing JSON.</string>
     <string name="title_activity_main">MainActivity</string>
 
+    <string name="online_status">online_status</string>
+    <string name="avatar_image">avatar_image</string>
+
 </resources>
