@@ -11,6 +11,7 @@ import android.util.Log;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
 
+import org.giorgi.chatapp.asynchtasks.ContactImageDownloaderTask;
 import org.giorgi.chatapp.asynchtasks.URLContactListDownloaderTask;
 import org.giorgi.chatapp.database.MyDBHelper;
 import org.giorgi.chatapp.model.Contact;
@@ -162,7 +163,15 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     @SuppressWarnings("unchecked")
     public void onContactListDownloaded(List<Contact> contacts) {
         App.contacts = (ArrayList<Contact>) contacts;
+        notifyAvatarDownloader();
         notifyObservers();
+    }
+
+    @SuppressWarnings("unchecked")
+    private void notifyAvatarDownloader() {
+        ContactImageDownloaderTask task = new ContactImageDownloaderTask();
+        task.setNetworkEventListener(this);
+        task.execute(App.contacts);
     }
 
 
