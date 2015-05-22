@@ -30,11 +30,11 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     public static final String ANY = "Any";
     private static final String URL =
             "https://dl.dropboxusercontent.com/u/28030891/FreeUni/Android/assinments/contacts.json";
-
     // Whether the display should be refreshed.
     public static boolean refreshDisplay = true;
     // The user's current network preference setting.
     public static String sPref = null;
+    private static Context context;
     // Whether there is a Wi-Fi connection.
     private static boolean wifiConnected = false;
     // Whether there is a mobile connection.
@@ -61,9 +61,14 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         return contacts;
     }
 
+    public static Context getContext() {
+        return context;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+        App.context = this;
         initApp();
     }
 
@@ -162,9 +167,16 @@ public class App extends Application implements NetworkEventListener, ChatEventL
 
 
     @Override
-    public void onAvatarDownloaded(byte[] imgData, String contactId) {
-        // TODO: Auto-generated method stub
-
+    public void onAvatarDownloaded(byte[] imgData, String contId) {
+        long contactId = Long.valueOf(contId);
+        for (int i = 0; i < App.contacts.size(); i++) {
+            Contact contact = App.contacts.get(i);
+            if (contact.getId() == contactId) {
+                contact.setAvatarBitmap(imgData);
+                break;
+            }
+        }
+        notifyObservers();
     }
 
     @Override

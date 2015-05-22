@@ -1,17 +1,40 @@
 package org.giorgi.chatapp.model;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import org.giorgi.chatapp.R;
+import org.giorgi.chatapp.app.App;
+
+import java.io.ByteArrayOutputStream;
+
 public class Contact {
 
-    private int id;
+    // Loading default avatar each time takes too much resources
+    private static final byte[] defaultAvatar;
+
+    static {
+        Bitmap bitmap = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.avatar);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        defaultAvatar = stream.toByteArray();
+    }
+
+    private long id;
     private String name;
     private String phone;
     private String avatar;
+    private byte[] avatarImage;
 
-    public int getId() {
+    public Contact() {
+        avatarImage = defaultAvatar;
+    }
+
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -37,5 +60,13 @@ public class Contact {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public Bitmap getAvatarBitmap() {
+        return BitmapFactory.decodeByteArray(avatarImage, 0, avatarImage.length);
+    }
+
+    public void setAvatarBitmap(byte[] avatarImage) {
+        this.avatarImage = avatarImage;
     }
 }

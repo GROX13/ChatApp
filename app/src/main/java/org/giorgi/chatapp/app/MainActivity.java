@@ -188,7 +188,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
                 name.setText(App.getContactList().get(position).getName());
                 phone.setText(App.getContactList().get(position).getPhone());
-                image.setImageDrawable(getResources().getDrawable(R.drawable.avatar));
+                image.setImageBitmap(App.getContactList().get(position).getAvatarBitmap());
 
                 ((ListView) parent).setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
