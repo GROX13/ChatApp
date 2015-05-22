@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -156,6 +157,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         private class ContactsView extends BaseAdapter {
 
+            public ContactsView() {
+                App.registerObserver(this);
+            }
+
             @Override
             public int getCount() {
                 return App.getContactList().size();
@@ -185,12 +190,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 phone.setText(App.getContactList().get(position).getPhone());
                 image.setImageDrawable(getResources().getDrawable(R.drawable.avatar));
 
-//                ((ListView) parent).setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                        selected = position + 1;
-//                    }
-//                });
+                ((ListView) parent).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        // TODO: Should implement on contact clicked
+                    }
+                });
 
                 return row;
             }
@@ -247,9 +252,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             switch (position) {
                 case 0:
                     return PlaceholderFragment.newInstance(position + 1);
-                case 2:
-                    return ContactListFragment.newInstance(position + 1);
                 case 1:
+                    return ContactListFragment.newInstance(position + 1);
+                case 2:
                     return PlaceholderFragment.newInstance(position + 1);
                 default:
                     return PlaceholderFragment.newInstance(position + 1);

@@ -8,6 +8,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.BaseAdapter;
+import android.widget.Toast;
 
 import org.giorgi.chatapp.asynchtasks.URLContactListDownloaderTask;
 import org.giorgi.chatapp.database.MyDBHelper;
@@ -28,6 +30,7 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     public static final String ANY = "Any";
     private static final String URL =
             "https://dl.dropboxusercontent.com/u/28030891/FreeUni/Android/assinments/contacts.json";
+
     // Whether the display should be refreshed.
     public static boolean refreshDisplay = true;
     // The user's current network preference setting.
@@ -38,9 +41,15 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     private static boolean mobileConnected = false;
     private static ChatTransport chatTransport;
     private static ArrayList<Contact> contacts;
+    // For saving observers
+    private static ArrayList<BaseAdapter> observers = new ArrayList<>();
     private static MyDBHelper dbHelper;
     // The BroadcastReceiver that tracks network connectivity changes.
     private NetworkReceiver receiver = new NetworkReceiver();
+
+    public static void registerObserver(BaseAdapter observer) {
+        App.observers.add(observer);
+    }
 
     public static ChatTransport getChatTransport() {
         return chatTransport;
@@ -138,12 +147,19 @@ public class App extends Application implements NetworkEventListener, ChatEventL
 
     }
 
+    private void notifyObservers() {
+        for (int i = 0; i < observers.size(); i++) {
+            observers.get(i).notifyDataSetChanged();
+        }
+    }
 
     @Override
     @SuppressWarnings("unchecked")
     public void onContactListDownloaded(List<Contact> contacts) {
         App.contacts = (ArrayList<Contact>) contacts;
+        notifyObservers();
     }
+
 
     @Override
     public void onAvatarDownloaded(byte[] imgData, String contactId) {
@@ -153,8 +169,8 @@ public class App extends Application implements NetworkEventListener, ChatEventL
 
     @Override
     public void onError(int errorCode, String errorMsg) {
-        // TODO: Auto-generated method stub
-
+        Toast.makeText(getApplicationContext(), errorMsg,
+                Toast.LENGTH_LONG).show();
     }
 
 }
