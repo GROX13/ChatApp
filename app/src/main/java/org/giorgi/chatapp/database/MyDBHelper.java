@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import org.giorgi.chatapp.model.Contact;
@@ -15,7 +16,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
     // Database Version
     public static final int DATABASE_VERSION = 1;
     // Database Name
-    public static final String DATABASE_NAME = "chat_manager";
+    public static final String DATABASE_NAME = "chat_app_database";
     // Contacts table name
     public static final String TABLE_CONTACTS = "contacts";
     // Contacts Table Columns names
@@ -24,36 +25,36 @@ public class MyDBHelper extends SQLiteOpenHelper {
     public static final String KEY_PH_NO = "phone_number";
     public static final String KEY_AVATAR_IMAGE = "avatar_image";
 
+    private static Context context;
+
     private SQLiteDatabase db;
-    private boolean exists;
 
     public MyDBHelper(Context context, String dbName, int version) {
         super(context, dbName, null, version);
-        db = getWritableDatabase();
-        exists = true;
+        MyDBHelper.context = context;
+        this.db = getWritableDatabase();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         String createContactsTable = "CREATE TABLE " + TABLE_CONTACTS + "("
                 + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT,"
-                + KEY_PH_NO + " TEXT" + KEY_AVATAR_IMAGE + " TEXT" + ")";
+                + KEY_PH_NO + " TEXT," + KEY_AVATAR_IMAGE + " TEXT" + ")";
         db.execSQL(createContactsTable);
-        exists = false;
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Soon will be commented
-//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
-//        onCreate(db);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+        onCreate(db);
     }
 
     /**
      * Adding new contact
      *
-     * @param contact
+     * @param contact contact object
      */
     public void addContact(Contact contact) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -106,7 +107,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
      * @return List of contacts containing database
      */
     public List<Contact> getAllContacts() {
-        List<Contact> contactList = new ArrayList<Contact>();
+        List<Contact> contactList = new ArrayList<>();
 
         String selectQuery = "SELECT  * FROM " + TABLE_CONTACTS;
 
@@ -118,7 +119,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
                 contactList.add(setUpContact(cursor));
             } while (cursor.moveToNext());
         }
-
+        db.close();
         return contactList;
     }
 
@@ -159,7 +160,22 @@ public class MyDBHelper extends SQLiteOpenHelper {
      * @return true if database exists false otherwise
      */
     public boolean dataBaseExists() {
-        // TODO: Should be done ASAP
+        boolean exists = true;
+        SQLiteDatabase checkDB = null;
+        try {
+            checkDB = SQLiteDatabase.openDatabase
+                    (context.getDatabasePath(DATABASE_NAME).toString(),
+                            null, SQLiteDatabase.OPEN_READONLY);
+            String countQuery = "SELECT  * FROM " + TABLE_CONTACTS;
+            Cursor cursor = checkDB.rawQuery(countQuery, null);
+            if (cursor.getCount() <= 0)
+                exists = false;
+            cursor.close();
+            checkDB.close();
+        } catch (SQLiteException e) {
+            // database doesn't exist yet.
+            exists = false;
+        }
         return exists;
     }
 

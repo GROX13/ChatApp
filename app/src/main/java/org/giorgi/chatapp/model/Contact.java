@@ -7,7 +7,6 @@ import org.giorgi.chatapp.R;
 import org.giorgi.chatapp.app.App;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Random;
 
 public class Contact {
 
@@ -26,9 +25,11 @@ public class Contact {
     private String phone;
     private String avatar;
     private byte[] avatarImage;
+    private boolean onlineStatus;
 
     public Contact() {
         avatarImage = defaultAvatar;
+        onlineStatus = false;
     }
 
     public long getId() {
@@ -72,11 +73,10 @@ public class Contact {
     }
 
     public boolean getOnlineStatus() {
-        Random random = new Random();
-        return random.nextBoolean();
+        return onlineStatus;
     }
 
-    public void setOnlineStatus() {
-
+    public void setOnlineStatus(boolean status) {
+        onlineStatus = status;
     }
 }

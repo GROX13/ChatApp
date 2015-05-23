@@ -96,8 +96,7 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         // device loses its Wi-Fi connection midway through the user using the app,
         // you don't want to refresh the display--this would force the display of
         // an error page instead of content.
-        if (refreshDisplay) {
-            // TODO: Check if database exists
+        if (refreshDisplay && !dbHelper.dataBaseExists()) {
             loadFromNet();
         } else {
             loadFromDataBase();
