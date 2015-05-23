@@ -1,6 +1,7 @@
 package org.giorgi.chatapp.app;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -21,6 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import org.giorgi.chatapp.R;
+import org.giorgi.chatapp.userintrface.ChatActivity;
 
 import java.util.Locale;
 
@@ -126,6 +128,70 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    /**
+     * A placeholder fragment containing a recently contact list view.
+     */
+    public static class RecentlyMessagedListFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        public RecentlyMessagedListFragment() {
+        }
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static ContactListFragment newInstance(int sectionNumber) {
+            ContactListFragment fragment = new ContactListFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_contact_list, container, false);
+            ((ListView) rootView).setAdapter(
+                    new ContactsView());
+            return rootView;
+        }
+
+        private class ContactsView extends BaseAdapter {
+
+            public ContactsView() {
+            }
+
+            @Override
+            public int getCount() {
+                return 0;
+            }
+
+            @Override
+            public Object getItem(int position) {
+                return App.getContactList().get(position);
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return App.getContactList().get(position).getId();
+            }
+
+            @Override
+            @SuppressLint("ViewHolder")
+            public View getView(int position, View convertView, ViewGroup parent) {
+                // TODO
+                return null;
+            }
+
+        }
+    }
+
 
     /**
      * A placeholder fragment containing a contact list view.
@@ -205,13 +271,46 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 ((ListView) parent).setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        // TODO: Should implement on contact clicked
+                        Intent intent = new Intent(getActivity(), ChatActivity.class);
+                        startActivity(intent);
                     }
                 });
 
                 return row;
             }
 
+        }
+    }
+
+    /**
+     * A placeholder fragment containing a settings simple view.
+     */
+    public static class SettingsFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        public SettingsFragment() {
+        }
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static PlaceholderFragment newInstance(int sectionNumber) {
+            PlaceholderFragment fragment = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.fragment_main, container, false);
         }
     }
 
@@ -263,11 +362,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return PlaceholderFragment.newInstance(position + 1);
+                    return RecentlyMessagedListFragment.newInstance(position + 1);
                 case 1:
                     return ContactListFragment.newInstance(position + 1);
                 case 2:
-                    return PlaceholderFragment.newInstance(position + 1);
+                    return SettingsFragment.newInstance(position + 1);
                 default:
                     return PlaceholderFragment.newInstance(position + 1);
             }

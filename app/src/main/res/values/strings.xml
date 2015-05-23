@@ -20,5 +20,6 @@
 
     <string name="online_status">online_status</string>
     <string name="avatar_image">avatar_image</string>
+    <string name="chat_activity">Chat</string>
 
 </resources>

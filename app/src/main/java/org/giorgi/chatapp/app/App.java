@@ -184,9 +184,15 @@ public class App extends Application implements NetworkEventListener, ChatEventL
 
     @SuppressWarnings("unchecked")
     private void notifyAvatarDownloader() {
-        ContactImageDownloaderTask task = new ContactImageDownloaderTask();
-        task.setNetworkEventListener(this);
-        task.execute(App.contacts);
+        if (((sPref.equals(ANY)) && (wifiConnected || mobileConnected))
+                || ((sPref.equals(WIFI)) && (wifiConnected))) {
+            // AsyncTask subclass
+            ContactImageDownloaderTask task = new ContactImageDownloaderTask();
+            task.setNetworkEventListener(this);
+            task.execute(App.contacts);
+        } else {
+            showError();
+        }
     }
 
 
