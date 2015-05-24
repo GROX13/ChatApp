@@ -145,8 +145,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static ContactListFragment newInstance(int sectionNumber) {
-            ContactListFragment fragment = new ContactListFragment();
+        public static RecentlyMessagedListFragment newInstance(int sectionNumber) {
+            RecentlyMessagedListFragment fragment = new RecentlyMessagedListFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
@@ -156,15 +156,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_contact_list, container, false);
+            View rootView =
+                    inflater.inflate(R.layout.fragment_recent_contacts_list, container, false);
             ((ListView) rootView).setAdapter(
-                    new ContactsView());
+                    new RecentView());
             return rootView;
         }
 
-        private class ContactsView extends BaseAdapter {
+        private class RecentView extends BaseAdapter {
 
-            public ContactsView() {
+            public RecentView() {
             }
 
             @Override
@@ -185,7 +186,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             @Override
             @SuppressLint("ViewHolder")
             public View getView(int position, View convertView, ViewGroup parent) {
-                // TODO
+                // TODO: Creating view
                 return null;
             }
 

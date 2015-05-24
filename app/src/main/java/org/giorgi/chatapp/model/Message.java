@@ -2,6 +2,7 @@ package org.giorgi.chatapp.model;
 
 public class Message {
     private boolean incoming;
+    private boolean read;
     private String destinationId;
     private String sourceId;
     private String message;
@@ -36,5 +37,13 @@ public class Message {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 }

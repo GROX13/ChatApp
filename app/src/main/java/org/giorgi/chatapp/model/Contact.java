@@ -6,29 +6,20 @@ import android.graphics.BitmapFactory;
 import org.giorgi.chatapp.R;
 import org.giorgi.chatapp.app.App;
 
-import java.io.ByteArrayOutputStream;
-
 public class Contact {
-
     // Loading default avatar each time takes too much resources
-    private static final byte[] defaultAvatar;
-
-    static {
-        Bitmap bitmap = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.avatar);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        defaultAvatar = stream.toByteArray();
-    }
-
+    private static final Bitmap defaultAvatar
+            = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.avatar);
     private long id;
     private String name;
     private String phone;
     private String avatar;
     private byte[] avatarImage;
     private boolean onlineStatus;
+    private Conversation conversation = new Conversation();
 
     public Contact() {
-        avatarImage = defaultAvatar;
+        avatarImage = null;
         onlineStatus = false;
     }
 
@@ -65,7 +56,10 @@ public class Contact {
     }
 
     public Bitmap getAvatarBitmap() {
-        return BitmapFactory.decodeByteArray(avatarImage, 0, avatarImage.length);
+        if (avatarImage != null)
+            return BitmapFactory.decodeByteArray(avatarImage, 0, avatarImage.length);
+        else
+            return defaultAvatar;
     }
 
     public void setAvatarBitmap(byte[] avatarImage) {
