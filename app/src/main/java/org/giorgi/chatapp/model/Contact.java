@@ -19,6 +19,7 @@ public class Contact {
     private String avatar;
     private byte[] avatarImage;
     private boolean onlineStatus;
+    private boolean unreadMessage;
     private List<Message> conversation;
 
     public Contact() {
@@ -77,11 +78,35 @@ public class Contact {
         onlineStatus = status;
     }
 
+    public void addMessage(Message message) {
+        this.conversation.add(message);
+    }
+
+    public Message getMessage(int index) {
+        try {
+            return this.conversation.get(index);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+    }
+
     public List<Message> getConversation() {
         return conversation;
     }
 
     public void setConversation(List<Message> conversation) {
         this.conversation = conversation;
+    }
+
+    public boolean haveUnreadMessage() {
+        return false;
+    }
+
+    public boolean isUnreadMessage() {
+        return unreadMessage;
+    }
+
+    public void setUnreadMessage(boolean unreadMessage) {
+        this.unreadMessage = unreadMessage;
     }
 }

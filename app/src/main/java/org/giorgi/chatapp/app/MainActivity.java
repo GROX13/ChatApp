@@ -259,6 +259,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                         phone = (TextView) row.findViewById(R.id.phone_number);
                 ImageView image = (ImageView) row.findViewById(R.id.avatar_image);
                 ImageView imageStatus = (ImageView) row.findViewById(R.id.status_image);
+                ImageView messageStatus = (ImageView) row.findViewById(R.id.message_read_status);
 
                 name.setText(App.getContactList().get(position).getName());
                 phone.setText(App.getContactList().get(position).getPhone());
@@ -268,6 +269,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                     imageStatus.setImageResource(R.drawable.online);
                 else
                     imageStatus.setImageResource(R.drawable.offline);
+
+                if (App.getContactList().get(position).haveUnreadMessage())
+                    messageStatus.setImageResource(R.drawable.unread);
+                else
+                    messageStatus.setImageResource(R.drawable.read);
 
                 ((ListView) parent).setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override

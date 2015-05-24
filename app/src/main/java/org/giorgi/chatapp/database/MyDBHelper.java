@@ -1,12 +1,13 @@
 package org.giorgi.chatapp.database;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import org.giorgi.chatapp.app.App;
 import org.giorgi.chatapp.model.Contact;
 
 import java.util.ArrayList;
@@ -15,32 +16,47 @@ import java.util.List;
 public class MyDBHelper extends SQLiteOpenHelper {
     // Database Version
     public static final int DATABASE_VERSION = 1;
+
     // Database Name
-    public static final String DATABASE_NAME = "chat_app_database";
+    public static final String DATABASE_NAME = "test_database_02";
+
     // Contacts table name
     public static final String TABLE_CONTACTS = "contacts";
-    // Contacts Table Columns names
+    // Contacts table column names
     public static final String KEY_ID = "id";
     public static final String KEY_NAME = "name";
     public static final String KEY_PH_NO = "phone_number";
-    public static final String KEY_AVATAR_IMAGE = "avatar_image";
+    public static final String KEY_AVATAR_IMAGE = "avatar_url";
+    public static final String KEY_HAVE_MESSAGE = "have_message";
 
-    private static Context context;
+    // Message table name
+    public static final String TABLE_MESSAGES = "messages";
+    // Message table column names
+    public static final String KEY_MESSAGE_ID = "message_id";
+    public static final String KEY_MESSAGE_SRC = "source";
+    public static final String KEY_MESSAGE_DST = "destination";
+    public static final String KEY_MESSAGE = "message";
+    public static final String KEY_MESSAGE_TIME = "time";
 
-    private SQLiteDatabase db;
-
-    public MyDBHelper(Context context, String dbName, int version) {
-        super(context, dbName, null, version);
-        MyDBHelper.context = context;
-        this.db = getWritableDatabase();
+    public MyDBHelper(String dbName, int version) {
+        super(App.getContext(), dbName, null, version);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createContactsTable = "CREATE TABLE " + TABLE_CONTACTS + "("
-                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT,"
-                + KEY_PH_NO + " TEXT," + KEY_AVATAR_IMAGE + " TEXT" + ")";
+        String createContactsTable = "CREATE TABLE " + TABLE_CONTACTS
+                + "(" + KEY_ID + " INTEGER PRIMARY KEY," + KEY_NAME + " TEXT," + KEY_PH_NO
+                + " TEXT," + KEY_AVATAR_IMAGE + " TEXT," + KEY_HAVE_MESSAGE + " INTEGER" + ")";
+        String createMessageTable = "CREATE TABLE " + TABLE_MESSAGES
+                + "(" + KEY_MESSAGE_ID + " INTEGER PRIMARY KEY,"
+                + KEY_MESSAGE_SRC + " INTEGER," + KEY_MESSAGE_DST
+                + " INTEGER," + KEY_MESSAGE + " TEXT," + KEY_MESSAGE_TIME + " TEXT" + ")";
+
+        Log.d("contacts table", createContactsTable);
+        Log.d("messages table", createMessageTable);
+
         db.execSQL(createContactsTable);
+        db.execSQL(createMessageTable);
     }
 
 
@@ -48,6 +64,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Soon will be commented
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
         onCreate(db);
     }
 
@@ -60,10 +77,12 @@ public class MyDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
+
         values.put(KEY_ID, contact.getId()); // Contact ID
         values.put(KEY_NAME, contact.getName()); // Contact Name
         values.put(KEY_PH_NO, contact.getPhone()); // Contact Phone Number
         values.put(KEY_AVATAR_IMAGE, contact.getAvatar()); // Contact Phone Number
+        values.put(KEY_HAVE_MESSAGE, contact.isUnreadMessage()); // Contact Has Unread Message
 
         // Inserting Row
         db.insert(TABLE_CONTACTS, null, values);
@@ -94,10 +113,11 @@ public class MyDBHelper extends SQLiteOpenHelper {
 
     private Contact setUpContact(Cursor cursor) {
         Contact contact = new Contact();
-        contact.setId(Long.valueOf(cursor.getString(0)));
+        contact.setId(cursor.getLong(0));
         contact.setName(cursor.getString(1));
         contact.setPhone(cursor.getString(2));
         contact.setAvatar(cursor.getString(3));
+        contact.setUnreadMessage((cursor.getInt(4) == 0));
         return contact;
     }
 
@@ -164,7 +184,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase checkDB = null;
         try {
             checkDB = SQLiteDatabase.openDatabase
-                    (context.getDatabasePath(DATABASE_NAME).toString(),
+                    (App.getContext().getDatabasePath(DATABASE_NAME).toString(),
                             null, SQLiteDatabase.OPEN_READONLY);
             String countQuery = "SELECT  * FROM " + TABLE_CONTACTS;
             Cursor cursor = checkDB.rawQuery(countQuery, null);

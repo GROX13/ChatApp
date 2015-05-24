@@ -1,10 +1,12 @@
 package org.giorgi.chatapp.model;
 
 public class Message {
+    public static final long MY_ID = -1;
+
     private boolean incoming;
     private boolean read;
-    private String destinationId;
-    private String sourceId;
+    private long destinationId;
+    private long sourceId;
     private String message;
 
     public boolean isIncoming() {
@@ -15,19 +17,19 @@ public class Message {
         this.incoming = incoming;
     }
 
-    public String getDestinationId() {
+    public long getDestinationId() {
         return destinationId;
     }
 
-    public void setDestinationId(String destinationId) {
+    public void setDestinationId(long destinationId) {
         this.destinationId = destinationId;
     }
 
-    public String getSourceId() {
+    public long getSourceId() {
         return sourceId;
     }
 
-    public void setSourceId(String sourceId) {
+    public void setSourceId(long sourceId) {
         this.sourceId = sourceId;
     }
 

@@ -1,16 +1,19 @@
 package org.giorgi.chatapp.app;
 
 import android.app.Application;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
 
+import org.giorgi.chatapp.R;
 import org.giorgi.chatapp.asynchtasks.ContactImageDownloaderTask;
 import org.giorgi.chatapp.asynchtasks.DBContactListDownloaderTask;
 import org.giorgi.chatapp.asynchtasks.URLContactListDownloaderTask;
@@ -69,14 +72,30 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     public void onCreate() {
         super.onCreate();
         App.context = this;
+
+        // TODO: Should remove this code!
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle("My notification")
+                        .setContentText("Hello World!");
+
+        // Sets an ID for the notification
+        int mNotificationId = 001;
+        // Gets an instance of the NotificationManager service
+        NotificationManager mNotifyMgr =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+        // TODO: For future usage
+
         initApp();
     }
 
     private void initApp() {
         chatTransport = new TestChatTransport();
         chatTransport.addChatEventListsner(this);
-        dbHelper = new MyDBHelper(App.getContext(),
-                MyDBHelper.DATABASE_NAME, MyDBHelper.DATABASE_VERSION);
+        dbHelper = new MyDBHelper(MyDBHelper.DATABASE_NAME, MyDBHelper.DATABASE_VERSION);
         // Set up contact list download for my application
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         NetworkReceiver receiver = new NetworkReceiver();
