@@ -1,24 +1,24 @@
 package org.giorgi.chatapp.transport;
 
+import org.giorgi.chatapp.model.Message;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.giorgi.chatapp.model.Message;
-
 
 public abstract class ChatTransport {
-    private List<ChatEventListsner> listeners = new ArrayList<ChatEventListsner>();
+    private List<ChatEventListener> listeners = new ArrayList<>();
 
     public abstract void start();
 
     public abstract void sendMessage(Message m);
 
-    public void addChatEventListsner(ChatEventListsner listener) {
+    public void addChatEventListener(ChatEventListener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
 
-    public void removeChatEventListsner(ChatEventListsner listener) {
+    public void removeChatEventListsner(ChatEventListener listener) {
         if (listeners.contains(listener))
             listeners.remove(listener);
     }

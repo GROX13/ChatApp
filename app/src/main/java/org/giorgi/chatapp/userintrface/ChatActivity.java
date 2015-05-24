@@ -19,9 +19,9 @@ import org.giorgi.chatapp.R;
 import org.giorgi.chatapp.app.App;
 import org.giorgi.chatapp.app.MainActivity;
 import org.giorgi.chatapp.model.Message;
-import org.giorgi.chatapp.transport.ChatEventListsner;
+import org.giorgi.chatapp.transport.ChatEventListener;
 
-public class ChatActivity extends ActionBarActivity implements ChatEventListsner {
+public class ChatActivity extends ActionBarActivity implements ChatEventListener {
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide fragments representing
      * each object in a collection. We use a {@link android.support.v4.app.FragmentStatePagerAdapter}
@@ -40,7 +40,7 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListsner
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        App.getChatTransport().addChatEventListsner(this);
+        App.getChatTransport().addChatEventListener(this);
         setContentView(R.layout.activity_collection_demo);
 
         // Create an adapter that when requested, will return a fragment representing an object in

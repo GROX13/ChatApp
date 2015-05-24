@@ -9,16 +9,20 @@ import android.util.Log;
 
 import org.giorgi.chatapp.app.App;
 import org.giorgi.chatapp.model.Contact;
+import org.giorgi.chatapp.model.Message;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MyDBHelper extends SQLiteOpenHelper {
     // Database Version
     public static final int DATABASE_VERSION = 1;
 
     // Database Name
-    public static final String DATABASE_NAME = "test_database_02";
+    public static final String DATABASE_NAME = "test_database_03";
 
     // Contacts table name
     public static final String TABLE_CONTACTS = "contacts";
@@ -83,7 +87,7 @@ public class MyDBHelper extends SQLiteOpenHelper {
         values.put(KEY_PH_NO, contact.getPhone()); // Contact Phone Number
         values.put(KEY_AVATAR_IMAGE, contact.getAvatar()); // Contact Phone Number
         values.put(KEY_HAVE_MESSAGE, contact.isUnreadMessage()); // Contact Has Unread Message
-
+        String a = values.toString();
         // Inserting Row
         db.insert(TABLE_CONTACTS, null, values);
         db.close(); // Closing database connection
@@ -117,7 +121,8 @@ public class MyDBHelper extends SQLiteOpenHelper {
         contact.setName(cursor.getString(1));
         contact.setPhone(cursor.getString(2));
         contact.setAvatar(cursor.getString(3));
-        contact.setUnreadMessage((cursor.getInt(4) == 0));
+        contact.setUnreadMessage((cursor.getInt(4) == 1));
+        contact.setConversation(getAllMessages(contact.getId()));
         return contact;
     }
 
@@ -174,6 +179,67 @@ public class MyDBHelper extends SQLiteOpenHelper {
      */
     public void deleteContact(Contact contact) {
         // TODO: May be done in the future
+    }
+
+    /**
+     * Getting All Contacts
+     *
+     * @return List of contacts containing database
+     */
+    public List<Message> getAllMessages(long id) {
+        List<Message> messageList = new ArrayList<>();
+
+        String selectQuery = "SELECT * FROM " + TABLE_MESSAGES
+                + " WHERE " + KEY_MESSAGE_SRC + " = " + id + " OR "
+                + KEY_MESSAGE_DST + " = " + id + " ORDER BY " + KEY_MESSAGE_TIME + " DESC";
+
+        Log.d("select messages", selectQuery);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+
+        if (cursor.moveToFirst()) {
+            do {
+                messageList.add(setUpMessage(cursor));
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        return messageList;
+    }
+
+
+    /**
+     * Adding new message
+     *
+     * @param message contact object
+     */
+    public void addMessage(Message message) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+
+        values.put(KEY_MESSAGE_DST, message.getDestinationId()); // Contact ID
+        values.put(KEY_MESSAGE_SRC, message.getSourceId()); // Contact Name
+        values.put(KEY_MESSAGE, message.getMessage()); // Contact Name
+        values.put(KEY_MESSAGE_TIME, getCurrentTimeStamp()); // Contact Phone Number
+
+        String a = values.toString();
+        // Inserting Row
+        db.insert(TABLE_CONTACTS, null, values);
+        db.close(); // Closing database connection
+    }
+
+    public String getCurrentTimeStamp() {
+        SimpleDateFormat sdfDate =
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date now = new Date();
+        return sdfDate.format(now);
+    }
+
+    private Message setUpMessage(Cursor cursor) {
+        /* TODO: Reading message from cursor */
+        return null;
     }
 
     /**

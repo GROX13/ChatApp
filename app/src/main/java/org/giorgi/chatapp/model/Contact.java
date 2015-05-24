@@ -98,10 +98,6 @@ public class Contact {
         this.conversation = conversation;
     }
 
-    public boolean haveUnreadMessage() {
-        return false;
-    }
-
     public boolean isUnreadMessage() {
         return unreadMessage;
     }

@@ -1,9 +1,9 @@
 package org.giorgi.chatapp.userintrface;
 
 import org.giorgi.chatapp.model.Message;
-import org.giorgi.chatapp.transport.ChatEventListsner;
+import org.giorgi.chatapp.transport.ChatEventListener;
 
-public class ContactListActivity extends CustomActivity implements ChatEventListsner {
+public class ContactListActivity extends CustomActivity implements ChatEventListener {
 
     @Override
     public void onIncomingMsg(Message m) {

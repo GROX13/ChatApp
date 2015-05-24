@@ -22,7 +22,7 @@ import org.giorgi.chatapp.model.Contact;
 import org.giorgi.chatapp.model.Message;
 import org.giorgi.chatapp.network.NetworkReceiver;
 import org.giorgi.chatapp.parser.ContactListJsonParser;
-import org.giorgi.chatapp.transport.ChatEventListsner;
+import org.giorgi.chatapp.transport.ChatEventListener;
 import org.giorgi.chatapp.transport.ChatTransport;
 import org.giorgi.chatapp.transport.NetworkEventListener;
 import org.giorgi.chatapp.transport.TestChatTransport;
@@ -30,7 +30,7 @@ import org.giorgi.chatapp.transport.TestChatTransport;
 import java.util.ArrayList;
 import java.util.List;
 
-public class App extends Application implements NetworkEventListener, ChatEventListsner {
+public class App extends Application implements NetworkEventListener, ChatEventListener {
     public static final String WIFI = "Wi-Fi";
     public static final String ANY = "Any";
     private static final String URL =
@@ -68,6 +68,10 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         return context;
     }
 
+    public static MyDBHelper getDBHelper() {
+        return dbHelper;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -94,7 +98,7 @@ public class App extends Application implements NetworkEventListener, ChatEventL
 
     private void initApp() {
         chatTransport = new TestChatTransport();
-        chatTransport.addChatEventListsner(this);
+        chatTransport.addChatEventListener(this);
         dbHelper = new MyDBHelper(MyDBHelper.DATABASE_NAME, MyDBHelper.DATABASE_VERSION);
         // Set up contact list download for my application
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);

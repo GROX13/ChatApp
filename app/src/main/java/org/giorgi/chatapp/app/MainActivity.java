@@ -270,7 +270,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 else
                     imageStatus.setImageResource(R.drawable.offline);
 
-                if (App.getContactList().get(position).haveUnreadMessage())
+                if (App.getContactList().get(position).isUnreadMessage())
                     messageStatus.setImageResource(R.drawable.unread);
                 else
                     messageStatus.setImageResource(R.drawable.read);
