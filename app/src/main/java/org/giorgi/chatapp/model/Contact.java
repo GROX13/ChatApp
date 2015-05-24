@@ -6,6 +6,9 @@ import android.graphics.BitmapFactory;
 import org.giorgi.chatapp.R;
 import org.giorgi.chatapp.app.App;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Contact {
     // Loading default avatar each time takes too much resources
     private static final Bitmap defaultAvatar
@@ -16,11 +19,11 @@ public class Contact {
     private String avatar;
     private byte[] avatarImage;
     private boolean onlineStatus;
-    private Conversation conversation = new Conversation();
+    private List<Message> conversation;
 
     public Contact() {
-        avatarImage = null;
         onlineStatus = false;
+        conversation = new ArrayList<>();
     }
 
     public long getId() {
@@ -72,5 +75,13 @@ public class Contact {
 
     public void setOnlineStatus(boolean status) {
         onlineStatus = status;
+    }
+
+    public List<Message> getConversation() {
+        return conversation;
+    }
+
+    public void setConversation(List<Message> conversation) {
+        this.conversation = conversation;
     }
 }
