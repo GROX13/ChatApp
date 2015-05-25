@@ -330,22 +330,22 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             return view;
         }
 
-        public void onToggleClicked(View view) {
-            // Is the toggle on?
-            boolean on = ((Switch) view).isChecked();
-
-            if (on) {
-                // TODO: Enable vibrate
-                Log.d("", "ჩეირთო ბიჯო!");
-            } else {
-                // TODO: Disable vibrate
-                Log.d("", "გამეირთო ბიჯო!");
-            }
-        }
-
         private View prepareConcrete(View view) {
 
             return view;
+        }
+    }
+
+    public void onToggleClicked(View view) {
+        // Is the toggle on?
+        boolean on = ((Switch) view).isChecked();
+
+        if (on) {
+            // TODO: Enable vibrate
+            Log.d("", "ჩეირთო ბიჯო!");
+        } else {
+            // TODO: Disable vibrate
+            Log.d("", "გამეირთო ბიჯო!");
         }
     }
 
