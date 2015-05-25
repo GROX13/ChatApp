@@ -1,11 +1,14 @@
 package org.giorgi.chatapp.userintrface;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.NavUtils;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -13,11 +16,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import org.giorgi.chatapp.R;
 import org.giorgi.chatapp.app.App;
 import org.giorgi.chatapp.app.MainActivity;
+import org.giorgi.chatapp.model.Contact;
 import org.giorgi.chatapp.model.Message;
 import org.giorgi.chatapp.transport.ChatEventListener;
 
@@ -62,6 +65,7 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
         // Set up the ViewPager, attaching the adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
+        mViewPager.setCurrentItem(MainActivity.selectedIndex);
     }
 
     @Override
@@ -98,8 +102,29 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
 
     @Override
     public void onIncomingMsg(Message m) {
-        // TODO Auto-generated method stub
-
+        // TODO: Auto-generated method stub
+        Contact c = App.getContactWithId(m.getSourceId());
+        c.addMessage(m);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(c.getName())
+                        .setContentText(m.getMessage());
+        Intent resultIntent = new Intent(this, ChatActivity.class);
+        // Because clicking the notification opens a new ("special") activity, there's
+        // no need to create an artificial back stack.
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        // Sets an ID for the notification
+        int mNotificationId = (int) c.getId();
+        // Gets an instance of the NotificationManager service
+        NotificationManager mNotifyMgr;
+        mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
     }
 
     @Override
@@ -118,7 +143,7 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
      * A {@link android.support.v4.app.FragmentStatePagerAdapter} that returns a fragment
      * representing an object in the collection.
      */
-    public static class DemoCollectionPagerAdapter extends FragmentStatePagerAdapter {
+    public class DemoCollectionPagerAdapter extends FragmentStatePagerAdapter {
 
         public DemoCollectionPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -128,39 +153,57 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
         public Fragment getItem(int i) {
             Fragment fragment = new DemoObjectFragment();
             Bundle args = new Bundle();
-            args.putInt(DemoObjectFragment.ARG_OBJECT, i + 1); // Our object is just an integer :-P
+            args.putLong(DemoObjectFragment.ARG_ID, MainActivity.selectedId);
+            args.putLong(DemoObjectFragment.ARG_INDEX, MainActivity.selectedIndex);
             fragment.setArguments(args);
+
+            // TODO: Be deleted
+            Message m = new Message();
+            m.setSourceId(1);
+            m.setDestinationId(-1);
+            m.setIncoming(true);
+            m.setMessage("hi");
+            ChatActivity.this.onIncomingMsg(m);
+
+            m = new Message();
+            m.setSourceId(23);
+            m.setDestinationId(-1);
+            m.setIncoming(true);
+            m.setMessage("hi from me");
+            ChatActivity.this.onIncomingMsg(m);
+
             return fragment;
         }
 
         @Override
         public int getCount() {
-            // For this contrived example, we have a 100-object collection.
-            return 100;
+            return App.getContactList().size();
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return "OBJECT " + (position + 1);
+            return App.getContactList().get(position).getName();
         }
     }
 
     /**
-     * A dummy fragment representing a section of the app, but that simply displays dummy text.
+     * A fragment representing a section of the app.
      */
     public static class DemoObjectFragment extends Fragment {
 
-        public static final String ARG_OBJECT = "object";
+        public static final String ARG_ID = "id";
+        public static final String ARG_INDEX = "index";
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_collection_object, container, false);
             Bundle args = getArguments();
-            ((TextView) rootView.findViewById(android.R.id.text1)).setText(
-                    Integer.toString(args.getInt(ARG_OBJECT)));
+            // TODO:
             return rootView;
         }
+
+
     }
 
 }

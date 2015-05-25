@@ -11,4 +11,5 @@
     <!-- Default online status image size -->
     <dimen name="activity_online_image_width">150dp</dimen>
     <dimen name="activity_online_image_height">150dp</dimen>
+    <dimen name="relative_layout_height">45dp</dimen>
 </resources>

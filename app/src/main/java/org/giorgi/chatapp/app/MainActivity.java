@@ -24,17 +24,21 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import org.giorgi.chatapp.R;
+import org.giorgi.chatapp.model.Message;
+import org.giorgi.chatapp.transport.ChatEventListener;
 import org.giorgi.chatapp.userintrface.ChatActivity;
 
 import java.util.Locale;
 
 
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
+public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, ChatEventListener {
 
     /**
      * This variable contains id of selected item
      */
     public static long selectedId = -1;
+    public static int selectedIndex = -1;
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -144,6 +148,21 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
             // TODO: Disable vibrate
             Log.d("", "გამეირთო ბიჯო!");
         }
+    }
+
+    @Override
+    public void onIncomingMsg(Message m) {
+        // TODO:
+    }
+
+    @Override
+    public void onOutgoingMsg(Message m) {
+        // TODO:
+    }
+
+    @Override
+    public void onStatusChanged(String contactId, boolean isOnline) {
+        // TODO:
     }
 
     /**
@@ -295,6 +314,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 ((ListView) parent).setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        MainActivity.selectedIndex = position;
                         MainActivity.selectedId = App.getContactList().get(position).getId();
                         Intent intent = new Intent(getActivity(), ChatActivity.class);
                         startActivity(intent);

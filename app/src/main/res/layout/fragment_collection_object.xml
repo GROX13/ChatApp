@@ -1,7 +1,61 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/text1"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:padding="32dp"
-    android:textSize="128sp" />
+    android:layout_height="match_parent">
+
+    <ListView
+        android:id="@+id/listMessages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/divider"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:padding="0dip"
+        android:stackFromBottom="true"
+        android:transcriptMode="alwaysScroll"
+        tools:listitem="@layout/message_left" />
+
+    <RelativeLayout
+        android:id="@id/divider"
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_above="@+id/rel_send_message" />
+
+    <RelativeLayout
+        android:id="@id/rel_send_message"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/relative_layout_height"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin">
+
+
+        <EditText
+            android:id="@+id/message_body_field"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@+id/send_button_id"
+            android:layout_alignTop="@id/send_button_id"
+            android:layout_marginBottom="-4dp"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_toLeftOf="@id/send_button_id"
+            android:background="@android:color/white"
+            android:hint="@string/message_placeholder"
+            android:imeOptions="actionSend"
+            android:textSize="14sp"
+            tools:ignore="RtlHardcoded" />
+
+        <Button
+            android:id="@id/send_button_id"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:text="@string/send_button"
+            tools:ignore="RtlHardcoded" />
+
+    </RelativeLayout>
+
+
+</RelativeLayout>
