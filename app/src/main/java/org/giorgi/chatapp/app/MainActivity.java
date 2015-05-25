@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import org.giorgi.chatapp.R;
@@ -30,6 +32,10 @@ import java.util.Locale;
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     /**
+     * This variable contains id of selected item
+     */
+    public static long selectedId = 0;
+    /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
      * {@link FragmentPagerAdapter} derivative, which will keep every
@@ -38,7 +44,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     SectionsPagerAdapter mSectionsPagerAdapter;
-
     /**
      * The {@link ViewPager} that will host the section contents.
      */
@@ -278,6 +283,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 ((ListView) parent).setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        MainActivity.selectedId = App.getContactList().get(position).getId();
                         Intent intent = new Intent(getActivity(), ChatActivity.class);
                         startActivity(intent);
                     }
@@ -306,8 +312,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+        public static SettingsFragment newInstance(int sectionNumber) {
+            SettingsFragment fragment = new SettingsFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
@@ -317,7 +323,29 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            return inflater.inflate(R.layout.fragment_main, container, false);
+            View view = inflater.inflate(R.layout.contact_settings, container, false);
+            if (selectedId != -1) {
+                view = prepareConcrete(view);
+            }
+            return view;
+        }
+
+        public void onToggleClicked(View view) {
+            // Is the toggle on?
+            boolean on = ((Switch) view).isChecked();
+
+            if (on) {
+                // TODO: Enable vibrate
+                Log.d("", "ჩეირთო ბიჯო!");
+            } else {
+                // TODO: Disable vibrate
+                Log.d("", "გამეირთო ბიჯო!");
+            }
+        }
+
+        private View prepareConcrete(View view) {
+
+            return view;
         }
     }
 

@@ -21,5 +21,9 @@
     <string name="online_status">online_status</string>
     <string name="avatar_image">avatar_image</string>
     <string name="chat_activity">Chat</string>
+    <string name="message_sound">Incoming message sound</string>
+    <string name="bar_notification">Status bar notifications</string>
+    <string name="contact_name_placeholder">Here goes contact name</string>
+    <string name="phone_number_placeholder">Here goes phone number</string>
 
 </resources>

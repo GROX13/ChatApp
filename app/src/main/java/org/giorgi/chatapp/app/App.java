@@ -72,6 +72,17 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         return dbHelper;
     }
 
+    public static Contact getContactWithId(long id) {
+        Contact cont = null;
+        for (int i = 0; i < App.contacts.size(); i++) {
+            if (App.contacts.get(i).getId() == id) {
+                cont = App.contacts.get(i);
+                break;
+            }
+        }
+        return cont;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
