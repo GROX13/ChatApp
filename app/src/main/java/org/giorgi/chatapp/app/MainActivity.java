@@ -34,7 +34,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     /**
      * This variable contains id of selected item
      */
-    public static long selectedId = 0;
+    public static long selectedId = -1;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -133,6 +133,19 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    public void onToggleClicked(View view) {
+        // Is the toggle on?
+        boolean on = ((Switch) view).isChecked();
+
+        if (on) {
+            // TODO: Enable vibrate
+            Log.d("", "ჩეირთო ბიჯო!");
+        } else {
+            // TODO: Disable vibrate
+            Log.d("", "გამეირთო ბიჯო!");
+        }
+    }
+
     /**
      * A placeholder fragment containing a recently contact list view.
      */
@@ -197,7 +210,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         }
     }
-
 
     /**
      * A placeholder fragment containing a contact list view.
@@ -324,29 +336,17 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.contact_settings, container, false);
-            if (selectedId != -1) {
-                view = prepareConcrete(view);
+            if (selectedId >= 0) {
+                ImageView avatar = (ImageView) view.findViewById(R.id.settings_avatar_image);
+                TextView name = (TextView) view.findViewById(R.id.settings_contact_name);
+                TextView phone = (TextView) view.findViewById(R.id.settings_phone_number);
+                avatar.setImageBitmap(App.getContactWithId(selectedId).getAvatarBitmap());
+                name.setText(App.getContactWithId(selectedId).getName());
+                phone.setText(App.getContactWithId(selectedId).getPhone());
             }
             return view;
         }
 
-        private View prepareConcrete(View view) {
-
-            return view;
-        }
-    }
-
-    public void onToggleClicked(View view) {
-        // Is the toggle on?
-        boolean on = ((Switch) view).isChecked();
-
-        if (on) {
-            // TODO: Enable vibrate
-            Log.d("", "ჩეირთო ბიჯო!");
-        } else {
-            // TODO: Disable vibrate
-            Log.d("", "გამეირთო ბიჯო!");
-        }
     }
 
     /**
