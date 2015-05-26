@@ -1,19 +1,17 @@
 package org.giorgi.chatapp.app;
 
 import android.app.Application;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
 
-import org.giorgi.chatapp.R;
 import org.giorgi.chatapp.asynchtasks.ContactImageDownloaderTask;
 import org.giorgi.chatapp.asynchtasks.DBContactListDownloaderTask;
 import org.giorgi.chatapp.asynchtasks.URLContactListDownloaderTask;
@@ -31,10 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class App extends Application implements NetworkEventListener, ChatEventListener {
+
     public static final String WIFI = "Wi-Fi";
     public static final String ANY = "Any";
     private static final String URL =
             "https://dl.dropboxusercontent.com/u/28030891/FreeUni/Android/assinments/contacts.json";
+
     // Whether the display should be refreshed.
     public static boolean refreshDisplay = true;
     // The user's current network preference setting.
@@ -44,11 +44,22 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     private static boolean wifiConnected = false;
     // Whether there is a mobile connection.
     private static boolean mobileConnected = false;
-    private static ChatTransport chatTransport;
+
+
+    /**
+     * This variable contains id of selected item
+     */
+    public static long selectedId = -1;
+    public static int selectedIndex = -1;
+
     private static ArrayList<Contact> contacts;
     // For saving observers
     private static ArrayList<BaseAdapter> observers = new ArrayList<>();
     private static MyDBHelper dbHelper;
+    private static TestChatTransport chatTransport;
+    private static ArrayList<Long> recentList;
+    private Handler handler;
+    private Runnable notifierRunnable;
 
     public static void registerObserver(BaseAdapter observer) {
         App.observers.add(observer);
@@ -83,33 +94,38 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         return cont;
     }
 
+    public static ArrayList<Long> getRecentList() {
+        if (recentList == null)
+            return new ArrayList<>();
+        return recentList;
+    }
+
+    public static void setRecentList(ArrayList<Long> recentList) {
+        App.recentList = recentList;
+    }
+
+    public static void saveDataToDatabase() {
+        // TODO: Should save data into database
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
         App.context = this;
-
-        // TODO: Should remove this code!
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setContentTitle("My notification")
-                        .setContentText("Hello World!");
-
-        // Sets an ID for the notification
-        int mNotificationId = 001;
-        // Gets an instance of the NotificationManager service
-        NotificationManager mNotifyMgr =
-                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        // Builds the notification and issues it.
-        mNotifyMgr.notify(mNotificationId, mBuilder.build());
-        // TODO: For future usage
-
         initApp();
     }
 
     private void initApp() {
         chatTransport = new TestChatTransport();
+        chatTransport.setContacts(App.contacts);
         chatTransport.addChatEventListener(this);
+        handler = new Handler();
+        notifierRunnable = new Runnable() {
+            @Override
+            public void run() {
+                notifyObservers();
+            }
+        };
         dbHelper = new MyDBHelper(MyDBHelper.DATABASE_NAME, MyDBHelper.DATABASE_VERSION);
         // Set up contact list download for my application
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
@@ -179,13 +195,17 @@ public class App extends Application implements NetworkEventListener, ChatEventL
 
     @Override
     public void onIncomingMsg(Message m) {
-        // TODO Auto-generated method stub
+        Contact c = App.getContactWithId(m.getSourceId());
+        c.addMessage(m);
+        c.setUnreadMessage(true);
+        // TODO:
+        handler.post(notifierRunnable);
     }
 
     @Override
     public void onOutgoingMsg(Message m) {
         // TODO Auto-generated method stub
-
+        chatTransport.sendMessage(m);
     }
 
     @Override
@@ -204,6 +224,8 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     @SuppressWarnings("unchecked")
     public void onContactListDownloaded(List<Contact> contacts) {
         App.contacts = (ArrayList<Contact>) contacts;
+        chatTransport.setContacts(App.contacts);
+        chatTransport.start();
         if (!dbHelper.dataBaseExists())
             notifyDataBaseSaver();
         notifyAvatarDownloader();
@@ -229,7 +251,6 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         }
     }
 
-
     @Override
     public void onAvatarDownloaded(byte[] imgData, String contId) {
         long contactId = Long.valueOf(contId);
@@ -248,5 +269,4 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         Toast.makeText(getApplicationContext(), errorMsg,
                 Toast.LENGTH_LONG).show();
     }
-
 }

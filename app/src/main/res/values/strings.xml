@@ -27,5 +27,7 @@
     <string name="phone_number_placeholder">Here goes phone number</string>
     <string name="message_placeholder">Enter Message ...</string>
     <string name="send_button">Send</string>
+    <string name="personal_avatar">personal_avatar</string>
+    <string name="message_text_placeholder">Here goes message text!</string>
 
 </resources>

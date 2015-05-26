@@ -9,7 +9,10 @@ import android.widget.Toast;
 
 import org.giorgi.chatapp.R;
 
-import static org.giorgi.chatapp.app.App.*;
+import static org.giorgi.chatapp.app.App.ANY;
+import static org.giorgi.chatapp.app.App.WIFI;
+import static org.giorgi.chatapp.app.App.refreshDisplay;
+import static org.giorgi.chatapp.app.App.sPref;
 
 /**
  * This BroadcastReceiver intercepts the android.net.ConnectivityManager.CONNECTIVITY_ACTION,
@@ -28,7 +31,7 @@ public class NetworkReceiver extends BroadcastReceiver {
         // Checks the user prefs and the network connection. Based on the result, decides
         // whether
         // to refresh the display or keep the current display.
-        // If the userpref is Wi-Fi only, checks to see if the device has a Wi-Fi connection.
+        // If the user pref is Wi-Fi only, checks to see if the device has a Wi-Fi connection.
         if (WIFI.equals(sPref) && networkInfo != null
                 && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
             // If device has its Wi-Fi connection, sets refreshDisplay

@@ -5,9 +5,11 @@ import java.util.List;
 import org.giorgi.chatapp.model.Contact;
 
 public interface NetworkEventListener {
-    public void onContactListDownloaded(List<Contact> contacts);
 
-    public void onAvatarDownloaded(byte[] imgData, String contactId);
+    void onContactListDownloaded(List<Contact> contacts);
 
-    public void onError(int errorCode, String errorMsg);
+    void onAvatarDownloaded(byte[] imgData, String contactId);
+
+    void onError(int errorCode, String errorMsg);
+
 }

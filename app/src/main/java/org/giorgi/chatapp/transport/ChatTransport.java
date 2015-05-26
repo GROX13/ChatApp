@@ -7,18 +7,20 @@ import java.util.List;
 
 
 public abstract class ChatTransport {
-    private List<ChatEventListener> listeners = new ArrayList<>();
+    protected List<ChatEventListener> listeners = new ArrayList<>();
 
     public abstract void start();
 
-    public abstract void sendMessage(Message m);
+    public abstract void sendMessage(Message message);
+
+    public abstract void notifyChatEventListener(Message message);
 
     public void addChatEventListener(ChatEventListener listener) {
         if (!listeners.contains(listener))
             listeners.add(listener);
     }
 
-    public void removeChatEventListsner(ChatEventListener listener) {
+    public void removeChatEventListener(ChatEventListener listener) {
         if (listeners.contains(listener))
             listeners.remove(listener);
     }

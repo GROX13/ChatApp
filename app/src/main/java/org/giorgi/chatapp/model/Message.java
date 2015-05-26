@@ -1,51 +1,38 @@
 package org.giorgi.chatapp.model;
 
 public class Message {
+
     public static final long MY_ID = -1;
 
-    private boolean incoming;
-    private boolean read;
-    private long destinationId;
-    private long sourceId;
-    private String message;
+    private final long destinationId;
+    private final long sourceId;
+    private final String message;
+    private final String time;
 
-    public boolean isIncoming() {
-        return incoming;
-    }
-
-    public void setIncoming(boolean incoming) {
-        this.incoming = incoming;
-    }
-
-    public long getDestinationId() {
-        return destinationId;
-    }
-
-    public void setDestinationId(long destinationId) {
-        this.destinationId = destinationId;
+    public Message(long source, long destination, String text, String time) {
+        this.sourceId = source;
+        this.destinationId = destination;
+        this.message = text;
+        this.time = time;
     }
 
     public long getSourceId() {
         return sourceId;
     }
 
-    public void setSourceId(long sourceId) {
-        this.sourceId = sourceId;
+    public long getDestinationId() {
+        return destinationId;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public String getTime() {
+        return time;
     }
 
-    public boolean isRead() {
-        return read;
-    }
-
-    public void setRead(boolean read) {
-        this.read = read;
+    public boolean isIncoming() {
+        return (destinationId == MY_ID);
     }
 }

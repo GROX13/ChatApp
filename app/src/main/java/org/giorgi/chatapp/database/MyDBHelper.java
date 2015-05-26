@@ -222,19 +222,12 @@ public class MyDBHelper extends SQLiteOpenHelper {
         values.put(KEY_MESSAGE_DST, message.getDestinationId()); // Contact ID
         values.put(KEY_MESSAGE_SRC, message.getSourceId()); // Contact Name
         values.put(KEY_MESSAGE, message.getMessage()); // Contact Name
-        values.put(KEY_MESSAGE_TIME, getCurrentTimeStamp()); // Contact Phone Number
+        values.put(KEY_MESSAGE_TIME, message.getTime()); // Contact Phone Number
 
         String a = values.toString();
         // Inserting Row
         db.insert(TABLE_CONTACTS, null, values);
         db.close(); // Closing database connection
-    }
-
-    public String getCurrentTimeStamp() {
-        SimpleDateFormat sdfDate =
-                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        Date now = new Date();
-        return sdfDate.format(now);
     }
 
     private Message setUpMessage(Cursor cursor) {

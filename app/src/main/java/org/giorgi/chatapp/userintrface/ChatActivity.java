@@ -16,6 +16,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import org.giorgi.chatapp.R;
 import org.giorgi.chatapp.app.App;
@@ -62,10 +65,12 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        App.getChatTransport().addChatEventListener(this);
+
         // Set up the ViewPager, attaching the adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
-        mViewPager.setCurrentItem(MainActivity.selectedIndex);
+        mViewPager.setCurrentItem(App.selectedIndex);
     }
 
     @Override
@@ -97,7 +102,7 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        App.getChatTransport().removeChatEventListsner(this);
+        App.getChatTransport().removeChatEventListener(this);
     }
 
     @Override
@@ -140,6 +145,61 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
     }
 
     /**
+     * A fragment representing a section of the app.
+     */
+    public static class DemoObjectFragment extends Fragment {
+
+        public static final String ARG_ID = "id";
+        public static final String ARG_INDEX = "index";
+        private int index;
+        private long id;
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_collection_object, container, false);
+            Bundle args = getArguments();
+            id = args.getLong(ARG_ID);
+            index = args.getInt(ARG_INDEX);
+            ((ListView) rootView.findViewById(R.id.list_messages))
+                    .setAdapter(new MessageListAdapter());
+            return rootView;
+        }
+
+
+        private class MessageListAdapter extends BaseAdapter {
+            @Override
+            public int getCount() {
+                return App.getContactList().get(index).getConversation().size();
+            }
+
+            @Override
+            public Object getItem(int position) {
+                return App.getContactList().get(index).getConversation().get(position);
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return position;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                View row;
+                Message m = App.getContactList().get(index).getMessage(position);
+                if (m.isIncoming())
+                    row = inflater.inflate(R.layout.incoming_message, parent, false);
+                else
+                    row = inflater.inflate(R.layout.outgouing_message, parent, false);
+                TextView view = (TextView) row.findViewById(R.id.message_text);
+                view.setText(m.getMessage());
+                return row;
+            }
+        }
+    }
+
+    /**
      * A {@link android.support.v4.app.FragmentStatePagerAdapter} that returns a fragment
      * representing an object in the collection.
      */
@@ -153,25 +213,9 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
         public Fragment getItem(int i) {
             Fragment fragment = new DemoObjectFragment();
             Bundle args = new Bundle();
-            args.putLong(DemoObjectFragment.ARG_ID, MainActivity.selectedId);
-            args.putLong(DemoObjectFragment.ARG_INDEX, MainActivity.selectedIndex);
+            args.putLong(DemoObjectFragment.ARG_ID, App.selectedId);
+            args.putLong(DemoObjectFragment.ARG_INDEX, App.selectedIndex);
             fragment.setArguments(args);
-
-            // TODO: Be deleted
-            Message m = new Message();
-            m.setSourceId(1);
-            m.setDestinationId(-1);
-            m.setIncoming(true);
-            m.setMessage("hi");
-            ChatActivity.this.onIncomingMsg(m);
-
-            m = new Message();
-            m.setSourceId(23);
-            m.setDestinationId(-1);
-            m.setIncoming(true);
-            m.setMessage("hi from me");
-            ChatActivity.this.onIncomingMsg(m);
-
             return fragment;
         }
 
@@ -184,26 +228,6 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
         public CharSequence getPageTitle(int position) {
             return App.getContactList().get(position).getName();
         }
-    }
-
-    /**
-     * A fragment representing a section of the app.
-     */
-    public static class DemoObjectFragment extends Fragment {
-
-        public static final String ARG_ID = "id";
-        public static final String ARG_INDEX = "index";
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_collection_object, container, false);
-            Bundle args = getArguments();
-            // TODO:
-            return rootView;
-        }
-
-
     }
 
 }

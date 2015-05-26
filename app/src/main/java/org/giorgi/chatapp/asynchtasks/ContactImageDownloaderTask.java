@@ -24,7 +24,7 @@ public class ContactImageDownloaderTask extends AsyncTask<List<Contact>, Object,
             Contact contact = contactsList.get(i);
             try {
                 publishProgress(downloadImage(contact.getAvatar()), String.valueOf(contact.getId()));
-            } catch (IOException e) {
+            } catch (Exception e) {
                 networkEventListener.onError(0, e.getMessage());
             }
         }

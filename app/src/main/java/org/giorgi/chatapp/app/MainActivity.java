@@ -34,12 +34,6 @@ import java.util.Locale;
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, ChatEventListener {
 
     /**
-     * This variable contains id of selected item
-     */
-    public static long selectedId = -1;
-    public static int selectedIndex = -1;
-
-    /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
      * {@link FragmentPagerAdapter} derivative, which will keep every
@@ -58,6 +52,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        App.getChatTransport().addChatEventListener(this);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -117,6 +113,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        App.saveDataToDatabase();
     }
 
     @Override
@@ -207,17 +209,17 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
             @Override
             public int getCount() {
-                return 0;
+                return App.getRecentList().size();
             }
 
             @Override
             public Object getItem(int position) {
-                return App.getContactList().get(position);
+                return App.getContactWithId(App.getRecentList().get(position));
             }
 
             @Override
             public long getItemId(int position) {
-                return App.getContactList().get(position).getId();
+                return App.getRecentList().get(position);
             }
 
             @Override
@@ -314,8 +316,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 ((ListView) parent).setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        MainActivity.selectedIndex = position;
-                        MainActivity.selectedId = App.getContactList().get(position).getId();
+                        App.selectedIndex = position;
+                        App.selectedId = App.getContactList().get(position).getId();
                         Intent intent = new Intent(getActivity(), ChatActivity.class);
                         startActivity(intent);
                     }
@@ -356,13 +358,13 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.contact_settings, container, false);
-            if (selectedId >= 0) {
+            if (App.selectedId >= 0) {
                 ImageView avatar = (ImageView) view.findViewById(R.id.settings_avatar_image);
                 TextView name = (TextView) view.findViewById(R.id.settings_contact_name);
                 TextView phone = (TextView) view.findViewById(R.id.settings_phone_number);
-                avatar.setImageBitmap(App.getContactWithId(selectedId).getAvatarBitmap());
-                name.setText(App.getContactWithId(selectedId).getName());
-                phone.setText(App.getContactWithId(selectedId).getPhone());
+                avatar.setImageBitmap(App.getContactWithId(App.selectedId).getAvatarBitmap());
+                name.setText(App.getContactWithId(App.selectedId).getName());
+                phone.setText(App.getContactWithId(App.selectedId).getPhone());
             }
             return view;
         }
