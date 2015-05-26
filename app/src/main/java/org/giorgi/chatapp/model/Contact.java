@@ -10,9 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Contact {
+
     // Loading default avatar each time takes too much resources
     private static final Bitmap defaultAvatar
             = BitmapFactory.decodeResource(App.getContext().getResources(), R.drawable.avatar);
+
     private long id;
     private String name;
     private String phone;
@@ -20,6 +22,8 @@ public class Contact {
     private byte[] avatarImage;
     private boolean onlineStatus;
     private boolean unreadMessage;
+    private boolean settingsSoundStatus;
+    private boolean notificationsStatus;
     private List<Message> conversation;
 
     public Contact() {
@@ -70,6 +74,10 @@ public class Contact {
         this.avatarImage = avatarImage;
     }
 
+    public byte[] getAvatarByteArr() {
+        return avatarImage;
+    }
+
     public boolean getOnlineStatus() {
         return onlineStatus;
     }
@@ -105,4 +113,25 @@ public class Contact {
     public void setUnreadMessage(boolean unreadMessage) {
         this.unreadMessage = unreadMessage;
     }
+
+    public boolean isSettingsSoundStatus() {
+        return settingsSoundStatus;
+    }
+
+    public void setSettingsSoundStatus(boolean settingsSoundStatus) {
+        this.settingsSoundStatus = settingsSoundStatus;
+    }
+
+    public boolean isNotificationsStatus() {
+        return notificationsStatus;
+    }
+
+    public void setNotificationsStatus(boolean notificationsStatus) {
+        this.notificationsStatus = notificationsStatus;
+    }
+
+    public boolean isAvatarDownloaded() {
+        return avatarImage != null;
+    }
+
 }
