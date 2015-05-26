@@ -1,17 +1,21 @@
 package org.giorgi.chatapp.app;
 
 import android.app.Application;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.BaseAdapter;
-import android.widget.Toast;
 
+import org.giorgi.chatapp.R;
 import org.giorgi.chatapp.asynchtasks.ContactImageDownloaderTask;
 import org.giorgi.chatapp.asynchtasks.DBContactListDownloaderTask;
 import org.giorgi.chatapp.asynchtasks.URLContactListDownloaderTask;
@@ -24,6 +28,7 @@ import org.giorgi.chatapp.transport.ChatEventListener;
 import org.giorgi.chatapp.transport.ChatTransport;
 import org.giorgi.chatapp.transport.NetworkEventListener;
 import org.giorgi.chatapp.transport.TestChatTransport;
+import org.giorgi.chatapp.userintrface.ChatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,27 +37,26 @@ public class App extends Application implements NetworkEventListener, ChatEventL
 
     public static final String WIFI = "Wi-Fi";
     public static final String ANY = "Any";
+    public static final String ID_STRING = "ID";
+    public static final String INDEX_STRING = "index";
     private static final String URL =
             "https://dl.dropboxusercontent.com/u/28030891/FreeUni/Android/assinments/contacts.json";
-
     // Whether the display should be refreshed.
     public static boolean refreshDisplay = true;
     // The user's current network preference setting.
     public static String sPref = null;
-    private static Context context;
-    // Whether there is a Wi-Fi connection.
-    private static boolean wifiConnected = false;
-    // Whether there is a mobile connection.
-    private static boolean mobileConnected = false;
-
-
     /**
      * This variable contains id of selected item
      */
     public static long selectedId = -1;
     public static int selectedIndex = -1;
-
+    private static Context context;
+    // Whether there is a Wi-Fi connection.
+    private static boolean wifiConnected = false;
+    // Whether there is a mobile connection.
+    private static boolean mobileConnected = false;
     private static ArrayList<Contact> contacts;
+    private static ArrayList<Long> recentContacts;
     // For saving observers
     private static ArrayList<BaseAdapter> observers = new ArrayList<>();
     private static MyDBHelper dbHelper;
@@ -75,6 +79,12 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         return contacts;
     }
 
+    public static ArrayList<Long> getRecentContactList() {
+        if (recentContacts == null)
+            return new ArrayList<>();
+        return recentContacts;
+    }
+
     public static Context getContext() {
         return context;
     }
@@ -83,21 +93,18 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         return dbHelper;
     }
 
-    public static Contact getContactWithId(long id) {
-        Contact cont = null;
+    public static int getIndex(long id) {
         for (int i = 0; i < App.contacts.size(); i++) {
             if (App.contacts.get(i).getId() == id) {
-                cont = App.contacts.get(i);
-                break;
+                App.contacts.get(i);
+                return i;
             }
         }
-        return cont;
+        return -1;
     }
 
-    public static ArrayList<Long> getRecentList() {
-        if (recentList == null)
-            return new ArrayList<>();
-        return recentList;
+    public static Contact getContactWithId(long id) {
+        return App.contacts.get(getIndex(id));
     }
 
     public static void setRecentList(ArrayList<Long> recentList) {
@@ -127,6 +134,7 @@ public class App extends Application implements NetworkEventListener, ChatEventL
             }
         };
         dbHelper = new MyDBHelper(MyDBHelper.DATABASE_NAME, MyDBHelper.DATABASE_VERSION);
+        recentContacts = dbHelper.getRecent();
         // Set up contact list download for my application
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         NetworkReceiver receiver = new NetworkReceiver();
@@ -197,15 +205,47 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     public void onIncomingMsg(Message m) {
         Contact c = App.getContactWithId(m.getSourceId());
         c.addMessage(m);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(c.getName())
+                        .setContentText(m.getMessage());
+        Intent resultIntent = new Intent(this, ChatActivity.class);
+        resultIntent.putExtra(ID_STRING, c.getId());
+        resultIntent.putExtra(INDEX_STRING, App.getIndex(c.getId()));
+        // Because clicking the notification opens a new ("special") activity, there's
+        // no need to create an artificial back stack.
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        // Sets an ID for the notification
+        int mNotificationId = (int) c.getId();
+        // Gets an instance of the NotificationManager service
+        NotificationManager mNotifyMgr;
+        mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        // Builds the notification and issues it.
+        mNotifyMgr.notify(mNotificationId, mBuilder.build());
+
+        c.addMessage(m);
         c.setUnreadMessage(true);
-        // TODO:
+        if (recentContacts.contains(m.getSourceId())) {
+            recentContacts.remove(m.getSourceId());
+        }
+        recentContacts.add(0, m.getSourceId());
         handler.post(notifierRunnable);
     }
 
     @Override
     public void onOutgoingMsg(Message m) {
         // TODO Auto-generated method stub
+        if (recentContacts.contains(m.getDestinationId())) {
+            recentContacts.remove(m.getDestinationId());
+        }
+        recentContacts.add(0, m.getDestinationId());
         chatTransport.sendMessage(m);
+        handler.post(notifierRunnable);
     }
 
     @Override
@@ -266,7 +306,7 @@ public class App extends Application implements NetworkEventListener, ChatEventL
 
     @Override
     public void onError(int errorCode, String errorMsg) {
-        Toast.makeText(getApplicationContext(), errorMsg,
-                Toast.LENGTH_LONG).show();
+        // Toast.makeText(getApplicationContext(), errorMsg,
+        // Toast.LENGTH_LONG).show();
     }
 }

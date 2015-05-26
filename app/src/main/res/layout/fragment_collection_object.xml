@@ -53,6 +53,7 @@
             android:layout_alignParentRight="true"
             android:layout_margin="@dimen/activity_horizontal_margin"
             android:text="@string/send_button"
+            android:onClick="sendMessage"
             tools:ignore="RtlHardcoded" />
 
     </RelativeLayout>

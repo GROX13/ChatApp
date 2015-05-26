@@ -11,8 +11,10 @@ import org.giorgi.chatapp.app.App;
 import org.giorgi.chatapp.model.Contact;
 import org.giorgi.chatapp.model.Message;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -258,4 +260,8 @@ public class MyDBHelper extends SQLiteOpenHelper {
         return exists;
     }
 
+    public ArrayList<Long> getRecent() {
+        // TODO:
+        return new ArrayList<>();
+    }
 }

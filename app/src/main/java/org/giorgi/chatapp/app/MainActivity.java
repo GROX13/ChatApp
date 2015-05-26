@@ -28,6 +28,7 @@ import org.giorgi.chatapp.model.Message;
 import org.giorgi.chatapp.transport.ChatEventListener;
 import org.giorgi.chatapp.userintrface.ChatActivity;
 
+import java.util.List;
 import java.util.Locale;
 
 
@@ -205,28 +206,63 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
         private class RecentView extends BaseAdapter {
 
             public RecentView() {
+                App.registerObserver(this);
             }
 
             @Override
             public int getCount() {
-                return App.getRecentList().size();
+                return App.getRecentContactList().size();
             }
 
             @Override
             public Object getItem(int position) {
-                return App.getContactWithId(App.getRecentList().get(position));
+                return App.getContactWithId(App.getRecentContactList().get(position));
             }
 
             @Override
             public long getItemId(int position) {
-                return App.getRecentList().get(position);
+                return App.getRecentContactList().get(position);
             }
 
             @Override
             @SuppressLint("ViewHolder")
             public View getView(int position, View convertView, ViewGroup parent) {
-                // TODO: Creating view
-                return null;
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                View row;
+                row = inflater.inflate(R.layout.recent_contact_element, parent, false);
+                TextView name = (TextView) row.findViewById(R.id.contact_name),
+                        phone = (TextView) row.findViewById(R.id.last_message);
+                ImageView image = (ImageView) row.findViewById(R.id.avatar_image);
+                ImageView imageStatus = (ImageView) row.findViewById(R.id.status_image);
+                ImageView messageStatus = (ImageView) row.findViewById(R.id.message_read_status);
+
+                List<Long> recent = App.getRecentContactList();
+                name.setText(App.getContactWithId(recent.get(position)).getName());
+                // May be error
+                phone.setText(App.getContactWithId(recent.get(position)).getMessage(0).getMessage());
+                image.setImageBitmap(App.getContactWithId(recent.get(position)).getAvatarBitmap());
+
+                if (App.getContactWithId(recent.get(position)).getOnlineStatus())
+                    imageStatus.setImageResource(R.drawable.online);
+                else
+                    imageStatus.setImageResource(R.drawable.offline);
+
+                if (App.getContactWithId(recent.get(position)).isUnreadMessage())
+                    messageStatus.setImageResource(R.drawable.unread);
+                else
+                    messageStatus.setImageResource(R.drawable.read);
+
+                ((ListView) parent).setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        App.selectedIndex = position;
+                        App.selectedId = App.getContactList().get(position).getId();
+                        Intent intent = new Intent(getActivity(), ChatActivity.class);
+                        startActivity(intent);
+                    }
+                });
+
+                return row;
             }
 
         }

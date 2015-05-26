@@ -17,7 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import org.giorgi.chatapp.R;
@@ -26,6 +30,7 @@ import org.giorgi.chatapp.app.MainActivity;
 import org.giorgi.chatapp.model.Contact;
 import org.giorgi.chatapp.model.Message;
 import org.giorgi.chatapp.transport.ChatEventListener;
+import org.giorgi.chatapp.transport.TestChatTransport;
 
 public class ChatActivity extends ActionBarActivity implements ChatEventListener {
     /**
@@ -134,8 +139,9 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
 
     @Override
     public void onOutgoingMsg(Message m) {
-        // TODO Auto-generated method stub
-
+        App.getContactWithId(App.selectedId).addMessage(m);
+        App app = (App) getApplication();
+        app.onOutgoingMsg(m);
     }
 
     @Override
@@ -151,6 +157,7 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
 
         public static final String ARG_ID = "id";
         public static final String ARG_INDEX = "index";
+        private ChatEventListener chatEventListener;
         private int index;
         private long id;
 
@@ -161,9 +168,30 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
             Bundle args = getArguments();
             id = args.getLong(ARG_ID);
             index = args.getInt(ARG_INDEX);
+            Button button = (Button) rootView.findViewById(R.id.send_button_id);
+
+            final MessageListAdapter messageListAdapter = new MessageListAdapter();
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    EditText editText = (EditText)
+                            ((RelativeLayout) v.getParent()).findViewById(R.id.message_body_field);
+                    String message = editText.getText().toString();
+                    editText.setText("");
+                    chatEventListener.onOutgoingMsg(
+                            new Message(Message.MY_ID,
+                                    App.selectedId, message,
+                                    TestChatTransport.getCurrentTimeStamp()));
+                    messageListAdapter.notifyDataSetChanged();
+                }
+            });
             ((ListView) rootView.findViewById(R.id.list_messages))
-                    .setAdapter(new MessageListAdapter());
+                    .setAdapter(messageListAdapter);
             return rootView;
+        }
+
+        public void setChatEventListener(ChatEventListener chatEventListener) {
+            this.chatEventListener = chatEventListener;
         }
 
 
@@ -211,10 +239,16 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
 
         @Override
         public Fragment getItem(int i) {
-            Fragment fragment = new DemoObjectFragment();
+            DemoObjectFragment fragment = new DemoObjectFragment();
+            fragment.setChatEventListener(ChatActivity.this);
             Bundle args = new Bundle();
+            if (App.selectedId < 0 || App.selectedIndex < 0) {
+                Intent intent = ChatActivity.this.getIntent();
+                App.selectedIndex = intent.getIntExtra(App.INDEX_STRING, App.selectedIndex);
+                App.selectedId = intent.getLongExtra(App.ID_STRING, App.selectedId);
+            }
             args.putLong(DemoObjectFragment.ARG_ID, App.selectedId);
-            args.putLong(DemoObjectFragment.ARG_INDEX, App.selectedIndex);
+            args.putInt(DemoObjectFragment.ARG_INDEX, App.selectedIndex);
             fragment.setArguments(args);
             return fragment;
         }

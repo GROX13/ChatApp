@@ -28,13 +28,13 @@ public class TestChatTransport extends ChatTransport {
 
 
     // Returns random integer in [min, max] interval
-    private static int randomInt(int min, int max) {
+    public static int randomInt(int min, int max) {
         Random rand = new Random();
         return rand.nextInt((max - min) + 1) + min;
     }
 
     // Returns timestamp formatted time
-    private static String getCurrentTimeStamp() {
+    public static String getCurrentTimeStamp() {
         SimpleDateFormat sdfDate =
                 new SimpleDateFormat(timeFormat, Locale.getDefault());
         Date now = new Date();
