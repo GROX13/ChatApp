@@ -76,6 +76,7 @@ public class ChatActivity extends ActionBarActivity implements ChatEventListener
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mDemoCollectionPagerAdapter);
         mViewPager.setCurrentItem(App.selectedIndex);
+        App.getContactList().get(App.selectedIndex).setUnreadMessage(false);
     }
 
     @Override

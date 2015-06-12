@@ -61,7 +61,6 @@ public class App extends Application implements NetworkEventListener, ChatEventL
     private static ArrayList<BaseAdapter> observers = new ArrayList<>();
     private static MyDBHelper dbHelper;
     private static TestChatTransport chatTransport;
-    private static ArrayList<Long> recentList;
     private Handler handler;
     private Runnable notifierRunnable;
 
@@ -89,10 +88,6 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         return context;
     }
 
-    public static MyDBHelper getDBHelper() {
-        return dbHelper;
-    }
-
     public static int getIndex(long id) {
         for (int i = 0; i < App.contacts.size(); i++) {
             if (App.contacts.get(i).getId() == id) {
@@ -105,10 +100,6 @@ public class App extends Application implements NetworkEventListener, ChatEventL
 
     public static Contact getContactWithId(long id) {
         return App.contacts.get(getIndex(id));
-    }
-
-    public static void setRecentList(ArrayList<Long> recentList) {
-        App.recentList = recentList;
     }
 
     public static void saveDataToDatabase() {
@@ -235,6 +226,7 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         }
         recentContacts.add(0, m.getSourceId());
         handler.post(notifierRunnable);
+        dbHelper.addMessage(m);
     }
 
     @Override
@@ -246,6 +238,7 @@ public class App extends Application implements NetworkEventListener, ChatEventL
         recentContacts.add(0, m.getDestinationId());
         chatTransport.sendMessage(m);
         handler.post(notifierRunnable);
+        dbHelper.addMessage(m);
     }
 
     @Override

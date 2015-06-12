@@ -131,10 +131,10 @@ public class MyDBHelper extends SQLiteOpenHelper {
         contact.setName(cursor.getString(1));
         contact.setPhone(cursor.getString(2));
         contact.setAvatar(cursor.getString(3));
-        contact.setAvatarBitmap(cursor.getBlob(4));
-        contact.setSettingsSoundStatus(cursor.getInt(5) == 1);
-        contact.setNotificationsStatus(cursor.getInt(6) == 1);
-        contact.setUnreadMessage((cursor.getInt(7) == 1));
+        contact.setUnreadMessage((cursor.getInt(4) == 1));
+        contact.setAvatarBitmap(cursor.getBlob(5));
+        contact.setSettingsSoundStatus(cursor.getInt(6) == 1);
+        contact.setNotificationsStatus(cursor.getInt(7) == 1);
 
         contact.setConversation(getAllMessages(contact.getId()));
 
@@ -183,8 +183,20 @@ public class MyDBHelper extends SQLiteOpenHelper {
      * @return 0 every time
      */
     public int updateContact(Contact contact) {
-        // TODO: May be done in the future
-        return 0;
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_NAME, contact.getName());
+        values.put(KEY_PH_NO, contact.getPhone());
+        values.put(KEY_AVATAR_IMAGE, contact.getAvatar());
+        values.put(KEY_AVATAR_BLOB, contact.getAvatarByteArr());
+        values.put(KEY_SOUND_STATUS, contact.isSettingsSoundStatus());
+        values.put(KEY_NOTIFICATION_STATUS, contact.isNotificationsStatus());
+        values.put(KEY_HAVE_MESSAGE, contact.isUnreadMessage());
+
+        // updating row
+        return db.update(TABLE_CONTACTS, values, KEY_ID + " = ?",
+                new String[]{String.valueOf(contact.getId())});
     }
 
     /**
@@ -234,19 +246,22 @@ public class MyDBHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
 
+        values.putNull(KEY_MESSAGE_ID);
         values.put(KEY_MESSAGE_DST, message.getDestinationId()); // Contact ID
         values.put(KEY_MESSAGE_SRC, message.getSourceId()); // Contact Name
         values.put(KEY_MESSAGE, message.getMessage()); // Contact Name
         values.put(KEY_MESSAGE_TIME, message.getTime()); // Contact Phone Number
 
         // Inserting Row
-        db.insert(TABLE_CONTACTS, null, values);
+        long l = db.insert(TABLE_MESSAGES, null, values);
         db.close(); // Closing database connection
     }
 
     private Message setUpMessage(Cursor cursor) {
         /* TODO: Reading message from cursor */
-        return null;
+
+        return new Message(cursor.getLong(2), cursor.getLong(1),
+                cursor.getString(3), cursor.getString(4));
     }
 
     /**
@@ -274,6 +289,41 @@ public class MyDBHelper extends SQLiteOpenHelper {
 
     public ArrayList<Long> getRecent() {
         // TODO:
-        return new ArrayList<>();
+        // SELECT source FROM messages ORDER BY time DESC;
+        String sourceQuery = "SELECT " + KEY_MESSAGE_SRC + " FROM " + TABLE_MESSAGES
+                + " ORDER BY " + KEY_MESSAGE_TIME + " DESC";
+        String dstQuery = "SELECT " + KEY_MESSAGE_DST + " FROM " + TABLE_MESSAGES
+                + " ORDER BY " + KEY_MESSAGE_TIME + " DESC";
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        ArrayList<Long> recent = new ArrayList<>();
+
+        Cursor cursor = db.rawQuery(sourceQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                long id = cursor.getLong(0);
+                if (!recent.contains(id) && id != Message.MY_ID) {
+                    recent.add(id);
+                }
+            } while (cursor.moveToNext());
+
+        }
+
+        cursor = db.rawQuery(dstQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                long id = cursor.getLong(0);
+                if (!recent.contains(id) && id != Message.MY_ID) {
+                    recent.add(id);
+                }
+            } while (cursor.moveToNext());
+
+        }
+
+        cursor.close();
+
+        return recent;
     }
 }

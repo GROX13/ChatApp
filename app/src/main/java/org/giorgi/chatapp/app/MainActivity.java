@@ -24,6 +24,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import org.giorgi.chatapp.R;
+import org.giorgi.chatapp.model.Contact;
 import org.giorgi.chatapp.model.Message;
 import org.giorgi.chatapp.transport.ChatEventListener;
 import org.giorgi.chatapp.userintrface.ChatActivity;
@@ -211,6 +212,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
             @Override
             public int getCount() {
+                if (App.getContactList().size() == 0) {
+                    return 0;
+                }
                 return App.getRecentContactList().size();
             }
 
@@ -237,7 +241,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                 ImageView messageStatus = (ImageView) row.findViewById(R.id.message_read_status);
 
                 List<Long> recent = App.getRecentContactList();
-                name.setText(App.getContactWithId(recent.get(position)).getName());
+                long pos = recent.get(position);
+                Contact c = App.getContactWithId(pos);
+                name.setText(c.getName());
                 // May be error
                 phone.setText(App.getContactWithId(recent.get(position)).getMessage(0).getMessage());
                 image.setImageBitmap(App.getContactWithId(recent.get(position)).getAvatarBitmap());
